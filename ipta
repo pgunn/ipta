@@ -20,9 +20,71 @@ sub handle_args(@)
 	# If it's the former, we want to do a partial parsing of the arguments
 	# but preserve the ordering so we don't need to fully understand and re-pack
 	# arguments for iptables.
+	# We'll try to keep things simple by having commands that pass blobs of config to
+	# iptables do the ipta args first.
 my @args = @_;
 
 
 }
 
+##########
+# Dispatch functions
 
+sub dispatch_remind
+{
+print <<EOREMIND;
+(From network Adapter, input interface visible)
+PREROUTING:raw
+(+session tracking)
+PREROUTING:mangle
+PREROUTING:nat
+(routing, to INPUT or FORWARD)
+
+(INPUT, input interface visible)
+INPUT:mangle
+INPUT:filter
+
+(FORWARD, input and output interface visible)
+FORWARD:mangle
+FORWARD:filter
+(To POSTROUTING)
+
+(From Software, output interface visible)
+OUTPUT:raw
+OUTPUT:mangle
+OUTPUT:nat
+OUTPUT:filter
+(routing, to POSTROUTING)
+
+(POSTOUTING, output interface visible)
+POSTROUTING:mangle
+POSTROUTInG:nat
+
+EOREMIND
+exit(0);
+}
+
+sub dispatch_list
+{
+}
+
+sub dispatch_add
+{
+}
+
+sub dispatch_remove
+{
+}
+
+sub dispatch_flush
+{
+}
+
+sub dispatch_lint
+{
+}
+
+sub usage
+{
+
+}
