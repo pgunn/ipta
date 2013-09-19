@@ -58,7 +58,7 @@ OUTPUT:filter
 
 (POSTOUTING, output interface visible)
 POSTROUTING:mangle
-POSTROUTInG:nat
+POSTROUTING:nat
 
 EOREMIND
 exit(0);
@@ -86,5 +86,27 @@ sub dispatch_lint
 
 sub usage
 {
+
+}
+
+##################
+
+sub directed_iptables
+{	# Exists to get tabular data for a particular chain-table permutation.
+	# TODO: Make this return data in a structured, regular format
+my ($chain, $table) = @_;
+
+my $tablepart = "";
+if(defined $table)
+	{$tablepart .= "-t $table";}
+my $ret = docmd("iptables -L $chain $tablepart -v --line-numbers"); # Do I want a -n ?
+return $ret; # XXX May want to process this first, maybe into a list? Maybe return a listref?
+}
+
+##################
+# General utilities
+
+sub docmd($)
+{ # TODO: Import this from my perl library
 
 }
