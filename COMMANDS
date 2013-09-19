@@ -1,0 +1,30 @@
+ipta remind
+	Reminds user of iptables chain/tables flow
+
+ipta list [CT|CTR]
+	List all matching rules in a nice format. Accepts
+	optional Chain/Table or Chain/Table/Rule arguments, in the format listed below
+
+ipta addstart CT RULE
+ipta addend CT RULE
+	Adds a new rule to the start or the end of a CT
+
+ipta addbefore CTR RULE
+ipta addafter CTR RULE
+	Adds a new rule before or after the named CTR
+
+ipta remove CTR
+	Removes the named rule
+
+ipta flush CT
+	Clears the named CT
+
+ipta lint
+	Attempts to look for inconsistencies or oddities in the set of rules.
+
+Arguments:
+	CT - Chain/Table. If the given Chain accepts multiple tables (non-custom chains do),
+		a Chain/Table pairing in the format CHAIN:TABLE
+		If it's a custom chain, a bare chain is acceptable.
+	CTR - Chain/Table/Rule. A CT combined with a rule number, as CT:Rule
+
