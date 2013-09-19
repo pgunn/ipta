@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings FATAL => qw(all);
+
+main();
+
+###########################
+
+sub main
+{
+my %cfg = handle_args(@ARGV);
+
+}
+
+sub handle_args(@)
+{	# More complex than my normal handle_args; 
+	# Here we determine if the commandline is ipta-ish or
+	# iptables-ish, and if it's the latter, we'll just exec iptables.
+	# If it's the former, we want to do a partial parsing of the arguments
+	# but preserve the ordering so we don't need to fully understand and re-pack
+	# arguments for iptables.
+my @args = @_;
+
+
+}
+
+
