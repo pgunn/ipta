@@ -11,6 +11,30 @@ sub main
 {
 my %cfg = handle_args(@ARGV);
 
+if($cfg{cmd} eq 'remind')
+	{
+	dispatch_remind();
+	}
+elsif($cfg{cmd} eq 'list')
+	{
+
+	}
+elsif($cfg{cmd} eq 'add')
+	{
+
+	}
+elsif($cfg{cmd} eq 'remove')
+	{
+
+	}
+elsif($cfg{cmd} eq 'flush')
+	{
+
+	}
+elsif($cfg{cmd} eq 'lint')
+	{
+
+	}
 }
 
 sub handle_args(@)
@@ -23,8 +47,22 @@ sub handle_args(@)
 	# We'll try to keep things simple by having commands that pass blobs of config to
 	# iptables do the ipta args first.
 my @args = @_;
+my %ret;
 
-
+if(! @args)
+	{usage();}
+if($args[0] =~ /^--help/)
+	{usage();}
+elsif($args[0] =~ /^--version/)
+	{version();exit(0);}
+elsif($args[0] =~ /^-/) # IPTables syntax, so just invoke iptables
+	{exec("iptables", @args);}
+else
+	{
+	$ret{cmd} = $args[0];
+	# TODO ... parse other arguments
+	}
+return %ret;
 }
 
 ##########
@@ -34,31 +72,32 @@ sub dispatch_remind
 {
 print <<EOREMIND;
 (From network Adapter, input interface visible)
-PREROUTING:raw
-(+session tracking)
-PREROUTING:mangle
-PREROUTING:nat
-(routing, to INPUT or FORWARD)
+PREROUTING:raw /* Can disable tracking with -j NOTRACK */
+PREROUTING:mangle /* Can alter TOS, TTL or mark */
+PREROUTING:nat /* Can do DNAT, SNAT, or REDIRECT */
+(Packets are routed, sent to INPUT or FORWARD chains)
 
 (INPUT, input interface visible)
-INPUT:mangle
-INPUT:filter
+INPUT:mangle /* Mainly used to mark packets for filtering */
+INPUT:filter /* Can drop or reject packets */
+(Packets handled by local system)
 
 (FORWARD, input and output interface visible)
-FORWARD:mangle
-FORWARD:filter
-(To POSTROUTING)
+FORWARD:mangle /* Can alter TOS, TTL, or mark */
+FORWARD:filter /* Can drop or reject packets */
+(Packets enter POSTROUTING chain)
 
 (From Software, output interface visible)
-OUTPUT:raw
-OUTPUT:mangle
-OUTPUT:nat
-OUTPUT:filter
-(routing, to POSTROUTING)
+OUTPUT:raw /* before session tracking, -m state permitted after here */
+OUTPUT:mangle /* Can alter TOS, TTL, or mark */
+OUTPUT:nat /* Can DNAT, SNAT, or REDIRECT */
+OUTPUT:filter /* Can drop or reject packets */
+(Packets are routed, sent to POSTROUTING chain)
 
-(POSTOUTING, output interface visible)
-POSTROUTING:mangle
-POSTROUTING:nat
+(POSTOUTING, output interface visible, for both forwarded and output packets)
+POSTROUTING:mangle /* Can alter TOS, TTL, or mark */
+POSTROUTING:nat /* Can do SNAT */
+(Packets sent out on relevant interface)
 
 EOREMIND
 exit(0);
@@ -157,3 +196,9 @@ sub docmd($)
 { # TODO: Import this from my perl library
 
 }
+
+sub version()
+{
+
+}
+
