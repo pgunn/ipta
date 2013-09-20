@@ -90,6 +90,7 @@ sub usage
 }
 
 ##################
+# iptables stuff
 
 sub directed_iptables
 {	# Exists to get tabular data for a particular chain-table permutation.
@@ -101,6 +102,52 @@ if(defined $table)
 	{$tablepart .= "-t $table";}
 my $ret = docmd("iptables -L $chain $tablepart -v --line-numbers"); # Do I want a -n ?
 return $ret; # XXX May want to process this first, maybe into a list? Maybe return a listref?
+}
+
+sub load_iptables
+{ # Load all the standard tablechains, and if we can, the nonstandard ones
+my %tabs;
+
+$tabs{prerouting}{raw}		= ipt_parse(directed_iptables('prerouting',	'raw'	));
+$tabs{prerouting}{mangle}	= ipt_parse(directed_iptables('prerouting',	'mangle'));
+$tabs{prerouting}{nat}		= ipt_parse(directed_iptables('prerouting',	'nat'	));
+
+$tabs{input}{mangle}		= ipt_parse(directed_iptables('input',		'mangle'));
+$tabs{input}{filter}		= ipt_parse(directed_iptables('input',		'filter'));
+
+$tabs{forward}{mangle}		= ipt_parse(directed_iptables('forward',	'mangle'));
+$tabs{forward}{filter}		= ipt_parse(directed_iptables('forward',	'filter'));
+
+$tabs{output}{raw}		= ipt_parse(directed_iptables('output',		'raw'	));
+$tabs{output}{mangle}		= ipt_parse(directed_iptables('output',		'mangle'));
+$tabs{output}{nat}		= ipt_parse(directed_iptables('output',		'nat'	));
+$tabs{output}{filter}		= ipt_parse(directed_iptables('output',		'filter'));
+
+$tabs{postrouting}{mangle}	= ipt_parse(directed_iptables('postrouting',	'mangle'));
+$tabs{postrouting}{nat}		= ipt_parse(directed_iptables('postrouting',	'nat'	));
+# TODO: How to detect custom chains?
+return \%tabs;
+}
+
+sub ipt_parse($)
+{	# Iterate over the lines that directed_iptables gives us and gives us a list of
+	# the rules in that table in structured form. iptables numbering is 1-based, so
+	# we'll need to be careful in later processing to take that into consideration so
+	# our list or lint or positioned adding functions don't confuse people.
+my ($textglob) = @_;
+my @rules;
+open(RULES, \$textglob) || die "Failed to read iptables result data\n";
+while(<RULES>)
+	{
+	# TODO
+	# 1) Skip headers
+	# 2) Create a hash to represent this line's directives
+	# 3) Step through the iptables listing to try to grab raw directives
+	#	and key-value pairs, packing them into the hash
+	# 4) At the end of the line, append this hash into @rules
+	}
+close(RULES);
+return @rules;
 }
 
 ##################
