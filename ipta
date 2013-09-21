@@ -225,8 +225,10 @@ my %tabs;
 @{$tabs{postrouting}{nat}}{'policy','rules'}	= ipt_parse(directed_iptables('POSTROUTING',	'nat'	));
 
 my @extrachains = find_extra_chains();
-
-# TODO: How to handle these?
+foreach my $extra (@extrachains)
+	{
+	@{$tabs{postrouting}{nat}}{'policy','rules'}	= ipt_parse(directed_iptables($extra,	undef	));
+	}
 return \%tabs;
 }
 
