@@ -3,7 +3,7 @@
 use strict;
 use warnings FATAL => qw(all);
 
-my $debuglvl = 10;
+my $debuglvl = 5;
 my $doit = 1; # Not likely to use this parameter in this software, but don't want to fork the function.
 my $version = "0.1";
 my $rootcheck = 1; # If you know you can run iptables while not root, you can set this to 0
@@ -256,6 +256,7 @@ while(<RULES>)
 		#	output interface (same idea as input)
 		#	source ip/network. Or "anywhere". Possibly !inverted
 		#	More text of rule. Possibly with C++ style comments. Possibly with some junk at the end.
+	tr/\n\r\f//d;
 	next if(/^\s*$/); # Skip blank lines
 	my %thisrule;
 	# We're going to keep whittling and parsing the first bit off of the line, in a field-sensitive way.
@@ -265,10 +266,13 @@ while(<RULES>)
 									# target is allowed to be blank
 	$thisrule{target} = $1;
 	$thisrule{proto} = $2;
+	dprint(9, "D: Targ $1 Proto $2");
 
 	s/^-- +//; # Not sure what goes in the "opt" field. For now, just assume it will be "--" like it always has been so far
-	s/^([A-Za-z0-9+]+) ([A-Za-z0-9+]+) +//; # Input and output network interfaces. Permit iptables "+" wildcard or "any".
+	dprint(10, "L[$_]\n");
+	s/^([A-Za-z0-9+*]+) +([A-Za-z0-9+*]+) +//; # Input and output network interfaces. Permit iptables "+" wildcard or "*" or "any".
 	@thisrule{'if_in', 'if_out'} = ($1, $2);
+	dprint(10, "D: if_in $1 if_out $2");
 
 	s/^(anywhere|!?[\d.\/]+) +//;
 	$thisrule{source} = $1;
@@ -284,6 +288,15 @@ while(<RULES>)
 	push(@rules, \%thisrule);
 	}
 close(RULES);
+print "Table summary:\n";
+print "\t(Default policy: $policy)\n";
+foreach my $rule (@rules)
+	{
+	print "RULE:\n";
+	foreach my $part (keys %$rule)
+		{dprint(8, "\t$part => " . $$rule{$part});}
+	}
+
 return ($policy, \@rules);
 }
 
