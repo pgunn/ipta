@@ -224,19 +224,38 @@ sub ipt_parse($)
 	# our list or lint or positioned adding functions don't confuse people.
 	#
 	# NOTE: This is meant to be called on the output of itpables -L -v --line-numbers for
-	#	only one table. 
+	#	only one table.
+	# NOTE: If the output of iptables changes much, this parser might need to be rewritten.
 my ($textglob) = @_;
 my @rules;
 open(RULES, "<", \$textglob) || die "Failed to read iptables result data:$!\n";
 my $policy = undef;
+
+my $summaryline = readline(RULES);
+$summaryline =~ /^Chain [A-Za-z0-9]+ \((.*)\)$/;
+my $innerdata = $1; # Differs between user-defined and builtin tables.
+if($innerdata =~ /policy ([A-Z]+)/) # Builtin chain.
+	{$policy = $1;}
+	# Otherwise it's a user-defined chain and has no policy field.
+
+readline(RULES); # We're not interested in the field header
 while(<RULES>)
-	{
-	# TODO
-	# 1) Read default policy from headers, then skip to the rules
-	# 2) Create a hash to represent this line's directives
-	# 3) Step through the iptables listing to try to grab raw directives
-	#	and key-value pairs, packing them into the hash
-	# 4) At the end of the line, append this hash into @rules
+	{	# This should be a numbered rule line.
+		# Fields are seperated by a number of spaces, padded to make them line up nicely.
+		# Fields:
+		#	Rule number
+		#	Packets this rule has seen (ignore this)
+		#	Bytes this rule has seen (ignore this)
+		#	Disposition for this rule (what happens if none is stated?)
+		#	Protocol (all, icmp, tcp, udp, maybe others)
+		#	Options (????)
+		#	input interface (any, or the name of one of the interfaces on the system, possibly plus-wildcarded, possibly !inverted)
+		#	output interface (same idea as input)
+		#	source ip/network. Or "anywhere". Possibly !inverted
+		#	More text of rule. Possibly with C++ style comments. Possibly with some junk at the end.
+	my %thisrule;
+	# TODO: Insert magic here. Parse the rule 
+	push(@rules, \%thisrule);
 	}
 close(RULES);
 return ($policy, \@rules);
