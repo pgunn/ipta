@@ -226,7 +226,7 @@ my %tabs;
 my @extrachains = find_extra_chains();
 foreach my $extra (@extrachains)
 	{
-	@{$tabs{postrouting}{nat}}{'policy','rules'}	= ipt_parse(directed_iptables($extra,	undef	));
+	@{$tabs{$extra}{custom}}{'policy','rules'}	= ipt_parse(directed_iptables($extra,	undef	));
 	}
 return \%tabs;
 }
@@ -319,6 +319,12 @@ sub stdout_display_ct($$;$)
 my ($tables, $ct, $options) = @_;
 
 #TODO 
+}
+
+sub sort_tables($$)
+{ # Custom sort function that gets the tables sorted in an order I like to display them in.
+my ($a, $b) = @_;
+
 }
 
 ##################
