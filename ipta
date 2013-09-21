@@ -246,7 +246,7 @@ while(<RULES>)
 		#	Rule number
 		#	Packets this rule has seen (ignore this)
 		#	Bytes this rule has seen (ignore this)
-		#	Disposition for this rule (what happens if none is stated?)
+		#	Disposition for this rule (BE CAREFUL: If there's no disposition, this field will be blank. WTF)
 		#	Protocol (all, icmp, tcp, udp, maybe others)
 		#	Options (????)
 		#	input interface (any, or the name of one of the interfaces on the system, possibly plus-wildcarded, possibly !inverted)
