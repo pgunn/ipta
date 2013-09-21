@@ -324,7 +324,11 @@ if(! defined $$tables{$chain})
 if(! defined $table) {$table = 'custom';}
 if(! defined $$tables{$chain}{$table})
 	{die "Asked to display table [$table] in chain [$chain] that does not exist\n";}
-
+print "CT: $chain:$table with default policy $$tables{$chain}{$table}{policy}\n";
+print join("\n", map
+			{ # This iterates over the rules in the CT in order. It'd be cool to tab-indent anything we display here, and show line-numbers!
+			; # TODO
+			} @{$$tables{$chain}{$table}{rules}});
 }
 
 # This might be useful somewhere; iterate over builtin chains/tables.
