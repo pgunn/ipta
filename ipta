@@ -205,23 +205,23 @@ sub load_iptables
 { # Load all the standard tablechains, and if we can, the nonstandard ones
 my %tabs;
 
-@{$tabs{prerouting}{raw}}{'policy','rules'}	= ipt_parse(directed_iptables('PREROUTING',	'raw'	));
-@{$tabs{prerouting}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('PREROUTING',	'mangle'));
-@{$tabs{prerouting}{nat}}{'policy','rules'}	= ipt_parse(directed_iptables('PREROUTING',	'nat'	));
+@{$tabs{PREROUTING}{raw}}{'policy','rules'}	= ipt_parse(directed_iptables('PREROUTING',	'raw'	));
+@{$tabs{PREROUTING}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('PREROUTING',	'mangle'));
+@{$tabs{PREROUTING}{nat}}{'policy','rules'}	= ipt_parse(directed_iptables('PREROUTING',	'nat'	));
 
-@{$tabs{input}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('INPUT',		'mangle'));
-@{$tabs{input}{filter}}{'policy','rules'}	= ipt_parse(directed_iptables('INPUT',		'filter'));
+@{$tabs{INPUT}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('INPUT',		'mangle'));
+@{$tabs{INPUT}{filter}}{'policy','rules'}	= ipt_parse(directed_iptables('INPUT',		'filter'));
 
-@{$tabs{forward}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('FORWARD',	'mangle'));
-@{$tabs{forward}{filter}}{'policy','rules'}	= ipt_parse(directed_iptables('FORWARD',	'filter'));
+@{$tabs{FORWARD}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('FORWARD',	'mangle'));
+@{$tabs{FORWARD}{filter}}{'policy','rules'}	= ipt_parse(directed_iptables('FORWARD',	'filter'));
 
-@{$tabs{output}{raw}}{'policy','rules'}		= ipt_parse(directed_iptables('OUTPUT',		'raw'	));
-@{$tabs{output}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('OUTPUT',		'mangle'));
-@{$tabs{output}{nat}}{'policy','rules'}		= ipt_parse(directed_iptables('OUTPUT',		'nat'	));
-@{$tabs{output}{filter}}{'policy','rules'}	= ipt_parse(directed_iptables('OUTPUT',		'filter'));
+@{$tabs{OUTPUT}{raw}}{'policy','rules'}		= ipt_parse(directed_iptables('OUTPUT',		'raw'	));
+@{$tabs{OUTPUT}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('OUTPUT',		'mangle'));
+@{$tabs{OUTPUT}{nat}}{'policy','rules'}		= ipt_parse(directed_iptables('OUTPUT',		'nat'	));
+@{$tabs{OUTPUT}{filter}}{'policy','rules'}	= ipt_parse(directed_iptables('OUTPUT',		'filter'));
 
-@{$tabs{postrouting}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('POSTROUTING',	'mangle'));
-@{$tabs{postrouting}{nat}}{'policy','rules'}	= ipt_parse(directed_iptables('POSTROUTING',	'nat'	));
+@{$tabs{POSTROUTING}{mangle}}{'policy','rules'}	= ipt_parse(directed_iptables('POSTROUTING',	'mangle'));
+@{$tabs{POSTROUTING}{nat}}{'policy','rules'}	= ipt_parse(directed_iptables('POSTROUTING',	'nat'	));
 
 my @extrachains = find_extra_chains();
 foreach my $extra (@extrachains)
