@@ -181,7 +181,7 @@ my ($chain, $table) = @_;
 my $tablepart = "";
 if(defined $table)
 	{$tablepart .= "-t $table";}
-my $ret = docmd("iptables -L $chain $tablepart -v --line-numbers"); # Do I want a -n ?
+my $ret = docmd("iptables -L $chain $tablepart -v -n --line-numbers"); # Do I want a -n ?
 return $ret; # XXX May want to process this first, maybe into a list? Maybe return a listref?
 }
 
@@ -256,7 +256,30 @@ while(<RULES>)
 		#	output interface (same idea as input)
 		#	source ip/network. Or "anywhere". Possibly !inverted
 		#	More text of rule. Possibly with C++ style comments. Possibly with some junk at the end.
+	next if(/^\s*$/); # Skip blank lines
 	my %thisrule;
+	# We're going to keep whittling and parsing the first bit off of the line, in a field-sensitive way.
+	s/^\d+ +//; # Rule number. We might validate these someday, but ignore them for now.
+	s/^[0-9]+[KMG]* +[0-9]+[KMG]* +//; # Hit statistics. We don't care about these.
+	s/^(?:(\w*) +)?(tcp|udp|udplite|icmp|esp|ah|sctp|all) +//; 	# Not entirely forward-proof. Kinda hackish, but the
+									# target is allowed to be blank
+	$thisrule{target} = $1;
+	$thisrule{proto} = $2;
+
+	s/^-- +//; # Not sure what goes in the "opt" field. For now, just assume it will be "--" like it always has been so far
+	s/^([A-Za-z0-9+]+) ([A-Za-z0-9+]+) +//; # Input and output network interfaces. Permit iptables "+" wildcard or "any".
+	@thisrule{'if_in', 'if_out'} = ($1, $2);
+
+	s/^(anywhere|!?[\d.\/]+) +//;
+	$thisrule{source} = $1;
+	s/^(anywhere|!?[\d.\/]+) +//;
+	$thisrule{dest} = $1;
+
+	s/\/\* (.*) \*\/ //; # Comments
+	if(defined $1)
+		{$thisrule{comment} = $1;}
+	$thisrule{extra} = $_; # Anything left goes into here
+
 	# TODO: Insert magic here. Parse the rule 
 	push(@rules, \%thisrule);
 	}
