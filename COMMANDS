@@ -1,7 +1,7 @@
 ipta remind
 	Reminds user of iptables chain/tables flow
 
-ipta list [CT|CTR]
+ipta list [CT|CTR|INPUTPATH|FWPATH|OUTPATH]
 	List all matching rules in a nice format. Accepts
 	optional Chain/Table or Chain/Table/Rule arguments, in the format listed below
 
@@ -21,6 +21,10 @@ ipta flush CT
 
 ipta lint
 	Attempts to look for inconsistencies or oddities in the set of rules.
+
+ipta imagine PACKET_DESCRIPTION
+	Attempts to figure out what path a specified packet will take through
+	iptables.
 
 Arguments:
 	CT - Chain/Table. If the given Chain accepts multiple tables (non-custom chains do),

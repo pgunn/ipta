@@ -3,6 +3,9 @@
 use strict;
 use warnings FATAL => qw(all);
 
+my $debuglvl = 10;
+my $doit = 1; # Not likely to use this parameter in this software, but don't want to fork the function.
+my $version = "0.1";
 main();
 
 ###########################
@@ -17,7 +20,7 @@ if($cfg{cmd} eq 'remind')
 	}
 elsif($cfg{cmd} eq 'list')
 	{
-
+	dispatch_list();
 	}
 elsif($cfg{cmd} eq 'add')
 	{
@@ -35,6 +38,15 @@ elsif($cfg{cmd} eq 'lint')
 	{
 
 	}
+elsif($cfg{cmd} eq 'imagine')
+	{
+
+	}
+elsif($cfg{cmd} eq 'version')
+	{
+	version();exit(0);
+	}
+else	{usage();}
 }
 
 sub handle_args(@)
@@ -105,6 +117,23 @@ exit(0);
 
 sub dispatch_list
 {
+my ($input) = @_;
+my $tables = load_iptables();
+
+if(! $input)
+	{
+
+	}
+else
+	{
+	# We're going to need to handle:
+	# CT - ChainTable
+	# CTR - ChainTable:Rule
+	# INPUTPATH - Show just the tables used for packets hitting the local box
+	# FWPATH - Show just the tables used for forwarding packets from one IF to another
+	# OUTPATH - Show just the tables used for packets outgoing generated from local box
+	die "TODO: finish dispatch_list: Not supported yet\n";
+	}
 }
 
 sub dispatch_add
@@ -123,9 +152,19 @@ sub dispatch_lint
 {
 }
 
-sub usage
+sub dispatch_imagine
 {
 
+}
+
+sub usage
+{ # TODO
+die "TODO: write a usage summary\n";
+}
+
+sub version()
+{
+print "ipta, version $version\n";
 }
 
 ##################
@@ -147,23 +186,23 @@ sub load_iptables
 { # Load all the standard tablechains, and if we can, the nonstandard ones
 my %tabs;
 
-$tabs{prerouting}{raw}		= ipt_parse(directed_iptables('prerouting',	'raw'	));
-$tabs{prerouting}{mangle}	= ipt_parse(directed_iptables('prerouting',	'mangle'));
-$tabs{prerouting}{nat}		= ipt_parse(directed_iptables('prerouting',	'nat'	));
+$tabs{prerouting}{raw}		= ipt_parse(directed_iptables('PREROUTING',	'raw'	));
+$tabs{prerouting}{mangle}	= ipt_parse(directed_iptables('PREROUTING',	'mangle'));
+$tabs{prerouting}{nat}		= ipt_parse(directed_iptables('PREROUTING',	'nat'	));
 
-$tabs{input}{mangle}		= ipt_parse(directed_iptables('input',		'mangle'));
-$tabs{input}{filter}		= ipt_parse(directed_iptables('input',		'filter'));
+$tabs{input}{mangle}		= ipt_parse(directed_iptables('INPUT',		'mangle'));
+$tabs{input}{filter}		= ipt_parse(directed_iptables('INPUT',		'filter'));
 
-$tabs{forward}{mangle}		= ipt_parse(directed_iptables('forward',	'mangle'));
-$tabs{forward}{filter}		= ipt_parse(directed_iptables('forward',	'filter'));
+$tabs{forward}{mangle}		= ipt_parse(directed_iptables('FORWARD',	'mangle'));
+$tabs{forward}{filter}		= ipt_parse(directed_iptables('FORWARD',	'filter'));
 
-$tabs{output}{raw}		= ipt_parse(directed_iptables('output',		'raw'	));
-$tabs{output}{mangle}		= ipt_parse(directed_iptables('output',		'mangle'));
-$tabs{output}{nat}		= ipt_parse(directed_iptables('output',		'nat'	));
-$tabs{output}{filter}		= ipt_parse(directed_iptables('output',		'filter'));
+$tabs{output}{raw}		= ipt_parse(directed_iptables('OUTPUT',		'raw'	));
+$tabs{output}{mangle}		= ipt_parse(directed_iptables('OUTPUT',		'mangle'));
+$tabs{output}{nat}		= ipt_parse(directed_iptables('OUTPUT',		'nat'	));
+$tabs{output}{filter}		= ipt_parse(directed_iptables('OUTPUT',		'filter'));
 
-$tabs{postrouting}{mangle}	= ipt_parse(directed_iptables('postrouting',	'mangle'));
-$tabs{postrouting}{nat}		= ipt_parse(directed_iptables('postrouting',	'nat'	));
+$tabs{postrouting}{mangle}	= ipt_parse(directed_iptables('POSTROUTING',	'mangle'));
+$tabs{postrouting}{nat}		= ipt_parse(directed_iptables('POSTROUTING',	'nat'	));
 # TODO: How to detect custom chains?
 return \%tabs;
 }
@@ -175,7 +214,7 @@ sub ipt_parse($)
 	# our list or lint or positioned adding functions don't confuse people.
 my ($textglob) = @_;
 my @rules;
-open(RULES, \$textglob) || die "Failed to read iptables result data\n";
+open(RULES, "<", \$textglob) || die "Failed to read iptables result data:$!\n";
 while(<RULES>)
 	{
 	# TODO
@@ -193,12 +232,23 @@ return @rules;
 # General utilities
 
 sub docmd($)
-{ # TODO: Import this from my perl library
-
+{               
+my ($cmdline) = @_;
+dprint(2, "$0: [$cmdline]");
+my $result;
+if($doit)
+	{
+	$result = `$cmdline`;
+	if($? != 0)
+		{die "************Command failed!**********\n";}
+	}
+return $result;
 }
 
-sub version()
+sub dprint($$)
 {
-
+my ($loglvl, $msg) = @_;
+if($debuglvl >= $loglvl)
+	{print "$msg\n";}
 }
 
