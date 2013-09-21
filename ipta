@@ -6,6 +6,7 @@ use warnings FATAL => qw(all);
 my $debuglvl = 10;
 my $doit = 1; # Not likely to use this parameter in this software, but don't want to fork the function.
 my $version = "0.1";
+my $rootcheck = 1; # If you know you can run iptables while not root, you can set this to 0
 main();
 
 ###########################
@@ -13,6 +14,8 @@ main();
 sub main
 {
 my %cfg = handle_args(@ARGV);
+
+beroot();
 
 if($cfg{cmd} eq 'remind')
 	{
@@ -263,6 +266,12 @@ return ($policy, \@rules);
 
 ##################
 # General utilities
+
+sub beroot
+{
+if($rootcheck && ($> ne 0))
+	{die "You need to be root\n";}
+}
 
 sub docmd($)
 {               
