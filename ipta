@@ -124,14 +124,14 @@ my ($input) = @_;
 my $tables = load_iptables();
 
 if(! $input)
-	{
+	{ # List everything
 
 	}
 else
-	{
+	{ # Selective listing.
 	# We're going to need to handle:
-	# CT - ChainTable
-	# CTR - ChainTable:Rule
+	# $CT - ChainTable
+	# $CTR - ChainTable:Rule
 	# INPUTPATH - Show just the tables used for packets hitting the local box
 	# FWPATH - Show just the tables used for forwarding packets from one IF to another
 	# OUTPATH - Show just the tables used for packets outgoing generated from local box
@@ -175,7 +175,6 @@ print "ipta, version $version\n";
 
 sub directed_iptables
 {	# Exists to get tabular data for a particular chain-table permutation.
-	# TODO: Make this return data in a structured, regular format
 my ($chain, $table) = @_;
 
 my $tablepart = "";
