@@ -189,7 +189,17 @@ sub find_extra_chains()
 { # Calls iptables -L with no further arguments, parses that to get a list of extra chains
 	# Custom chains start with "Chain CHAINNAME (n references)
 	# And this holds solid for just the "iptables -L" syntax (as opposed to with -v)
-# TODO
+my @extrachains;
+my $allchains = docmd("iptables -L");
+open(ALLCH, "<", \$allchains) || die "Failed to read iptables ALLC result data:$!\n";
+while(<ALLCH>)
+	{
+	next unless(/^Chain ([A-Za-z0-9]+) \(\d+ references\)/);
+	my $chainname = $1;
+	dprint(4, "Found custom chain [$chainname]");
+	push(@extrachains, $chainname);
+	}
+return @extrachains;
 }
 
 sub load_iptables
