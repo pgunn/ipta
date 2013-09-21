@@ -318,14 +318,23 @@ sub stdout_display_ct($$;$)
 { # Passed the big table structure and the name of a CT, display it. Optional third parameter is a hashref that tunes what's displayed
 my ($tables, $ct, $options) = @_;
 
-#TODO 
+my ($chain, $table) = split(/:/, $ct, 2);
+if(! defined $$tables{$chain})
+	{die "Asked to display chain [$chain] that does not exist\n";}
+if(! defined $table) {$table = 'custom';}
+if(! defined $$tables{$chain}{$table})
+	{die "Asked to display table [$table] in chain [$chain] that does not exist\n";}
+
 }
 
-sub sort_tables($$)
-{ # Custom sort function that gets the tables sorted in an order I like to display them in.
-my ($a, $b) = @_;
-
-}
+# This might be useful somewhere; iterate over builtin chains/tables.
+#foreach my $chain (qw/PREROUTING FORWARD INPUT OUTPUT POSTROUTING/)
+#	{
+#	foreach my $table (qw/raw mangle nat filter/)
+#		{
+#
+#		}
+#	}
 
 ##################
 # General utilities
