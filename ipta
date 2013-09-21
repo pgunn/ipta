@@ -311,6 +311,16 @@ foreach my $rule (@rules)
 return ($policy, \@rules);
 }
 
+#################
+# Display stuff
+
+sub stdout_display_ct($$;$)
+{ # Passed the big table structure and the name of a CT, display it. Optional third parameter is a hashref that tunes what's displayed
+my ($tables, $ct, $options) = @_;
+
+#TODO 
+}
+
 ##################
 # General utilities
 
