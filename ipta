@@ -337,20 +337,22 @@ print join("\n", map
 # General iterators
 
 sub iter_cts 
-{
+{ # XXX There's probably a way to rewrite this more elegantly
 my ($tables, $fnref) = @_;
 
+my @ret;
 foreach my $chain (qw/PREROUTING FORWARD INPUT OUTPUT POSTROUTING/)
 	{
 	foreach my $table (qw/raw mangle nat filter/)
 		{
-		&$fnref($tables, "$chain:$table");
+		push(@ret, &$fnref($tables, "$chain:$table"));
 		}
 	}
 foreach my $chainextra (find_extra_chains())
 	{
-	&$fnref($tables, "$chainextra:custom");
+	push(@ret, &$fnref($tables, "$chainextra:custom"));
 	}
+return @ret;
 }
 
 ##################
