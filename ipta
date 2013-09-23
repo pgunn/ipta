@@ -125,7 +125,7 @@ my $tables = load_iptables();
 
 if(! $input)
 	{ # List everything
-
+	iter_cts($tables, \&stdout_display_ct);
 	}
 else
 	{ # Selective listing.
@@ -273,6 +273,7 @@ while(<RULES>)
 	# We're going to keep whittling and parsing the first bit off of the line, in a field-sensitive way.
 	s/^(\d+) +//; # Rule number. Save this because our iterators are not always stateful.
 	$thisrule{number} = $1;
+	dprint(4, "Loaded rule $1");
 
 	s/^[0-9]+[KMG]* +[0-9]+[KMG]* +//; # Hit statistics. We don't care about these.
 	s/^(?:(\w*) +)?(tcp|udp|udplite|icmp|esp|ah|sctp|all) +//; 	# Not entirely forward-proof. Kinda hackish, but the
@@ -301,11 +302,11 @@ while(<RULES>)
 	push(@rules, \%thisrule);
 	}
 close(RULES);
-print "Table summary:\n";
-print "\t(Default policy: $policy)\n";
+dprint(6, "Table summary:");
+dprint(6, "\t(Default policy: $policy)");
 foreach my $rule (@rules)
 	{
-	print "RULE:\n";
+	dprint(6, "RULE:");
 	foreach my $part (keys %$rule)
 		{dprint(8, "\t$part => " . $$rule{$part});}
 	}
@@ -324,7 +325,12 @@ my ($policy, $rules) = access_ct($tables, $chain, $table);
 print "CT: $chain:$table with default policy $policy\n";
 print join("\n", map
 			{ # This iterates over the rules in the CT in order. It'd be cool to tab-indent anything we display here, and show line-numbers!
-			; # TODO
+#			print "DE:" . join("||", keys %$_) . "\n";
+			"Rule: $$_{number}\n"
+.			"\tTarget: "	. ($$_{target}	// "Any")	. "\n"
+.			"\tProto: "	. ($$_{proto}	// "Any")	. "\n"
+.			"\tSource: "	. ($$_{source}	// "Any")	. "\n"
+.			"\tDest: "	. ($$_{dest}	// "Any")	. "\n";
 			} @$rules);
 }
 
@@ -348,6 +354,7 @@ foreach my $chain (qw/PREROUTING FORWARD INPUT OUTPUT POSTROUTING/)
 	{
 	foreach my $table (qw/raw mangle nat filter/)
 		{
+		next if(! defined($$tables{$chain}{$table}));
 		push(@ret, &$fnref($tables, "$chain", "$table"));
 		}
 	}
