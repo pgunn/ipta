@@ -340,6 +340,14 @@ sub iter_cts
 { # XXX There's probably a way to rewrite this more elegantly
 my ($tables, $fnref) = @_;
 
+return(	iter_cts_main($tables, $fnref),
+	iter_cts_custom($tables, $fnref));
+}
+
+sub iter_cts_main
+{
+my ($tables, $fnref) = @_;
+
 my @ret;
 foreach my $chain (qw/PREROUTING FORWARD INPUT OUTPUT POSTROUTING/)
 	{
@@ -348,6 +356,14 @@ foreach my $chain (qw/PREROUTING FORWARD INPUT OUTPUT POSTROUTING/)
 		push(@ret, &$fnref($tables, "$chain:$table"));
 		}
 	}
+return @ret;
+}
+
+sub iter_cts_custom
+{
+my ($tables, $fnref) = @_;
+
+my @ret;
 foreach my $chainextra (find_extra_chains())
 	{
 	push(@ret, &$fnref($tables, "$chainextra:custom"));
