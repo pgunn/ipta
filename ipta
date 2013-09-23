@@ -271,7 +271,9 @@ while(<RULES>)
 	next if(/^\s*$/); # Skip blank lines
 	my %thisrule;
 	# We're going to keep whittling and parsing the first bit off of the line, in a field-sensitive way.
-	s/^\d+ +//; # Rule number. We might validate these someday, but ignore them for now.
+	s/^(\d+) +//; # Rule number. Save this because our iterators are not always stateful.
+	$thisrule{number} = $1;
+
 	s/^[0-9]+[KMG]* +[0-9]+[KMG]* +//; # Hit statistics. We don't care about these.
 	s/^(?:(\w*) +)?(tcp|udp|udplite|icmp|esp|ah|sctp|all) +//; 	# Not entirely forward-proof. Kinda hackish, but the
 									# target is allowed to be blank
@@ -331,14 +333,25 @@ print join("\n", map
 			} @{$$tables{$chain}{$table}{rules}});
 }
 
-# This might be useful somewhere; iterate over builtin chains/tables.
-#foreach my $chain (qw/PREROUTING FORWARD INPUT OUTPUT POSTROUTING/)
-#	{
-#	foreach my $table (qw/raw mangle nat filter/)
-#		{
-#
-#		}
-#	}
+#################
+# General iterators
+
+sub iter_cts 
+{
+my ($tables, $fnref, $fnargs) = @_;
+
+foreach my $chain (qw/PREROUTING FORWARD INPUT OUTPUT POSTROUTING/)
+	{
+	foreach my $table (qw/raw mangle nat filter/)
+		{
+		&$fnref($tables, "$chain:$table", $fnargs);
+		}
+	}
+foreach my $chainextra (find_extra_chains())
+	{
+	&$fnref($tables, "$chainextra:custom", $fnargs);
+	}
+}
 
 ##################
 # General utilities
