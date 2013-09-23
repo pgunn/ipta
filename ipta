@@ -338,18 +338,18 @@ print join("\n", map
 
 sub iter_cts 
 {
-my ($tables, $fnref, $fnargs) = @_;
+my ($tables, $fnref) = @_;
 
 foreach my $chain (qw/PREROUTING FORWARD INPUT OUTPUT POSTROUTING/)
 	{
 	foreach my $table (qw/raw mangle nat filter/)
 		{
-		&$fnref($tables, "$chain:$table", $fnargs);
+		&$fnref($tables, "$chain:$table");
 		}
 	}
 foreach my $chainextra (find_extra_chains())
 	{
-	&$fnref($tables, "$chainextra:custom", $fnargs);
+	&$fnref($tables, "$chainextra:custom");
 	}
 }
 
