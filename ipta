@@ -167,8 +167,17 @@ sub dispatch_add
 	# before - position is immediately before the CTR indicated in the string
 	# after - position is immediately after the CTR indicated in the string
 my ($posspec, $args) = @_;
-#TODO
 
+# The first step is to extract from $posspec and $args the place we're going to
+#	insert the rule.
+my $pospart = calculate_addpos($posspec, $args); # XXX Do I need do say \$args or is $args good enough
+
+# The second step is to do any macro expansion or rewriting or other good stuff that
+#	we're adding that iptables doesn't do itself
+my $addparts = figure_ipt_addparts($args); # Returns a string!
+# The third step is to call iptables appropriately.
+# TODO - Enable this when we're ready.
+# docmd("iptables $pospart $addparts");
 }
 
 sub dispatch_remove
@@ -207,6 +216,25 @@ die "TODO: write a usage summary\n";
 sub version()
 {
 print "ipta, version $version\n";
+}
+
+###################
+# Parsewrangling for dispatch functions
+
+sub calculate_addpos
+{	# Given a posspec and a reference to some args, figure where in the CTR a rule something should go.
+	# Consume as much of @$args as we need to to figure that out, leaving no positional stuff left in there
+	# to foul up the later call to iptables with noncomputed stuff.
+	# Returns a pospart ; something like "-t nat -I PREROUTING 4"
+my ($posspec, $args) = @_;
+# TODO
+}
+
+sub figure_ipt_addparts
+{	# Given the remaining ipta syntax in @$args, return a string out of it, doing any clever
+	# improvements over iptables syntax we want to do along the way.
+my ($args) = @_;
+# TODO
 }
 
 ##################
