@@ -23,27 +23,27 @@ if($cfg{cmd} eq 'remind')
 	}
 elsif($cfg{cmd} eq 'list')
 	{
-	dispatch_list();
+	dispatch_list($cfg{args});
 	}
 elsif($cfg{cmd} eq 'add')
 	{
-
+	dispatch_add($cfg{args});
 	}
 elsif($cfg{cmd} eq 'remove')
 	{
-
+	dispatch_remove($cfg{args});
 	}
 elsif($cfg{cmd} eq 'flush')
 	{
-
+	dispatch_flush($cfg{args});
 	}
 elsif($cfg{cmd} eq 'lint')
 	{
-
+	dispatch_lint($cfg{args});
 	}
 elsif($cfg{cmd} eq 'imagine')
 	{
-
+	dispatch_imagine($cfg{args});
 	}
 elsif($cfg{cmd} eq 'version')
 	{
@@ -74,8 +74,8 @@ elsif($args[0] =~ /^-/) # IPTables syntax, so just invoke iptables
 	{exec("iptables", @args);}
 else
 	{
-	$ret{cmd} = $args[0];
-	# TODO ... parse other arguments
+	$ret{cmd} = shift @args;
+	$ret{args} = \@args; # Let the individual commands figure out how to parse this stuff.
 	}
 return %ret;
 }
@@ -120,10 +120,10 @@ exit(0);
 
 sub dispatch_list
 {
-my ($input) = @_;
+my ($args) = @_;
 my $tables = load_iptables();
 
-if(! $input)
+if(! @$args)
 	{ # List everything
 	iter_cts($tables, \&stdout_display_ct);
 	}
@@ -141,22 +141,36 @@ else
 
 sub dispatch_add
 {
+my ($args) = @_;
+#TODO
+
 }
 
 sub dispatch_remove
 {
+my ($args) = @_;
+#TODO
+
 }
 
 sub dispatch_flush
 {
+my ($args) = @_;
+#TODO
+
 }
 
 sub dispatch_lint
 {
+my ($args) = @_;
+#TODO
+
 }
 
 sub dispatch_imagine
 {
+my ($args) = @_;
+#TODO
 
 }
 
