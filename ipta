@@ -25,10 +25,30 @@ elsif($cfg{cmd} eq 'list')
 	{
 	dispatch_list($cfg{args});
 	}
+###########################
+# A bunch of rule-adding modes that try to be smart about positions to let the user
+# forget the syntax of the -I insertion. 
 elsif($cfg{cmd} eq 'add')
 	{
-	dispatch_add($cfg{args});
+	dispatch_add('infer', $cfg{args});
 	}
+elsif($cfg{cmd} eq 'addstart')
+	{
+	dispatch_add('start', $cfg{args});
+	}
+elsif($cfg{cmd} eq 'addend')
+	{
+	dispatch_add('end', $cfg{args});
+	}
+elsif($cfg{cmd} eq 'addbefore')
+	{
+	dispatch_add('before', $cfg{args});
+	}
+elsif($cfg{cmd} eq 'addafter')
+	{
+	dispatch_add('after', $cfg{args});
+	}
+
 elsif($cfg{cmd} eq 'remove')
 	{
 	dispatch_remove($cfg{args});
@@ -140,8 +160,13 @@ else
 }
 
 sub dispatch_add
-{
-my ($args) = @_;
+{	# First argument is a directive indicating where to add the rule:
+	# infer - position is indicated in the config string
+	# start - position is at the start of the CT indicated in the string
+	# end - position is at the end of the CT indicated in the string
+	# before - position is immediately before the CTR indicated in the string
+	# after - position is immediately after the CTR indicated in the string
+my ($posspec, $args) = @_;
 #TODO
 
 }
