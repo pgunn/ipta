@@ -170,7 +170,9 @@ my ($posspec, $args) = @_;
 
 # The first step is to extract from $posspec and $args the place we're going to
 #	insert the rule.
-my $pospart = calculate_addpos($posspec, $args); # XXX Do I need do say \$args or is $args good enough
+my $chain; # TODO: Figure out how to initialise these
+my $table; # ....
+my $pospart = calculate_addpos($posspec, $args, $chain, $table); # XXX Do I need do say \$args or is $args good enough
 
 # The second step is to do any macro expansion or rewriting or other good stuff that
 #	we're adding that iptables doesn't do itself
@@ -221,13 +223,36 @@ print "ipta, version $version\n";
 ###################
 # Parsewrangling for dispatch functions
 
-sub calculate_addpos
+sub calculate_addpos($$$$)
 {	# Given a posspec and a reference to some args, figure where in the CTR a rule something should go.
 	# Consume as much of @$args as we need to to figure that out, leaving no positional stuff left in there
 	# to foul up the later call to iptables with noncomputed stuff.
 	# Returns a pospart ; something like "-t nat -I PREROUTING 4"
-my ($posspec, $args) = @_;
-# TODO
+	#
+	# Posspec = "infer", start, end, before, after
+my ($posspec, $args, $chain, $table) = @_;
+my $pre = "";
+if($table ne 'custom') {$pre = "-t $table ";}
+
+if($posspec eq 'start')		{return "$pre -I $chain 1";}
+elsif($posspec eq 'end')	{return "$pre -A $chain";}
+elsif($posspec eq 'before')
+	{
+	my $ruleno = shift(@$args);
+	if($ruleno !~ /^\d+/)	{die "Positional [$ruleno] is not a number\n";}
+	return "$pre -I $chain $ruleno"; # No guarantee that rule exists, but we'll let iptables handle that.
+	}
+elsif($posspec eq 'after')
+	{
+	my $ruleno = shift(@$args);
+	if($ruleno !~ /^\d+/)	{die "Positional [$ruleno] is not a number\n";}
+	$ruleno++;
+	return "$pre -I $chain $ruleno"; # No guarantee that rule exists, but we'll let iptables handle that.
+	}
+elsif($posspec eq 'infer')
+	{ # TODO
+	die "This add syntax is not yet supported\n";
+	}
 }
 
 sub figure_ipt_addparts
