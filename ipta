@@ -179,14 +179,20 @@ my $pospart = calculate_addpos($posspec, $args); # XXX Do I need do say \$args o
 my $addparts = figure_ipt_addparts($args); # Returns a string!
 # The third step is to call iptables appropriately.
 # TODO - Enable this when we're ready.
-# docmd("iptables $pospart $addparts");
+docmd("iptables $pospart $addparts");
 }
 
 sub dispatch_remove
-{
+{	# ipta remove CTR
+	# Maybe someday I'll also allow for removal of custom chains with this command, or another one?
+	# A cascaded deletion of custom chains would be handy; right now iptables doesn't allow that.
 my ($args) = @_;
-#TODO
 
+my $ctr = shift(@$args);
+my($chain, $table, $ruleno) = split(/:/, $ctr);
+my $tablebit = "";
+if($table ne 'custom') {$tablebit = "-t $table";}
+docmd("iptables $tablebit -D $chain $ruleno");
 }
 
 sub dispatch_flush
@@ -275,9 +281,11 @@ elsif($posspec eq 'infer')
 
 sub figure_ipt_addparts
 {	# Given the remaining ipta syntax in @$args, return a string out of it, doing any clever
-	# improvements over iptables syntax we want to do along the way.
+	# improvements over iptables syntax we want to do along the way. 
 my ($args) = @_;
 # TODO
+
+return(join(" ", @$args)); # For now, just stringify..
 }
 
 ##################
